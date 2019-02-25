@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.MovieAdapter;
@@ -11,7 +12,7 @@ import com.sbaltazar.popularmovies.adapters.MovieAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieDiscoveryActivity extends AppCompatActivity {
+public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAdapter.MoviePosterClickListener {
 
     private RecyclerView mMovieRecyclerView;
 
@@ -38,8 +39,13 @@ public class MovieDiscoveryActivity extends AppCompatActivity {
         titles.add("Sezaline");
         titles.add("Migration stopping");
 
-        MovieAdapter adapter = new MovieAdapter(titles);
+        MovieAdapter adapter = new MovieAdapter(titles, this);
 
         mMovieRecyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onMoviePosterClick() {
+        Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show();
     }
 }

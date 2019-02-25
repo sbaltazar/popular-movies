@@ -17,8 +17,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     private List<String> mMovieTitles;
 
-    public MovieAdapter(List<String> movieTitles) {
+    final private MoviePosterClickListener mOnClickListener;
+
+    public interface MoviePosterClickListener {
+        void onMoviePosterClick();
+    }
+
+    public MovieAdapter(List<String> movieTitles, MoviePosterClickListener listener) {
         mMovieTitles = movieTitles;
+        mOnClickListener = listener;
     }
 
     @NonNull
@@ -51,7 +58,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         notifyDataSetChanged();
     }
 
-    class MovieViewHolder extends RecyclerView.ViewHolder {
+    class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView poster;
         private TextView title;
@@ -61,6 +68,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
             poster = itemView.findViewById(R.id.iv_movie_poster);
             title = itemView.findViewById(R.id.tv_movie_title);
+
+            itemView.setOnClickListener(this);
         }
 
         void bind(){
@@ -68,5 +77,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             title.setText(mMovieTitles.get(position));
         }
 
+        @Override
+        public void onClick(View v) {
+            mOnClickListener.onMoviePosterClick();
+        }
     }
 }
