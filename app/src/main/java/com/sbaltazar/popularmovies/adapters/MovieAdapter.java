@@ -10,21 +10,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sbaltazar.popularmovies.R;
+import com.sbaltazar.popularmovies.models.Movie;
 
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
-    private List<String> mMovieTitles;
+    private List<Movie> mMovies;
 
     final private MoviePosterClickListener mOnClickListener;
 
     public interface MoviePosterClickListener {
-        void onMoviePosterClick();
+        void onMoviePosterClick(String title);
     }
 
-    public MovieAdapter(List<String> movieTitles, MoviePosterClickListener listener) {
-        mMovieTitles = movieTitles;
+    public MovieAdapter(List<Movie> movieTitles, MoviePosterClickListener listener) {
+        mMovies = movieTitles;
         mOnClickListener = listener;
     }
 
@@ -47,14 +48,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public int getItemCount() {
-        if(mMovieTitles != null){
-            return mMovieTitles.size();
+        if(mMovies != null){
+            return mMovies.size();
         }
         return 0;
     }
 
-    public void setMovieTitles(List<String> titles){
-        mMovieTitles = titles;
+    public void setMovies(List<Movie> movies){
+        mMovies = movies;
         notifyDataSetChanged();
     }
 
@@ -74,12 +75,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         void bind(){
             int position = getAdapterPosition();
-            title.setText(mMovieTitles.get(position));
+            title.setText(mMovies.get(position).getTitle());
         }
 
         @Override
         public void onClick(View v) {
-            mOnClickListener.onMoviePosterClick();
+            int position = getAdapterPosition();
+            String title = mMovies.get(position).getTitle();
+            mOnClickListener.onMoviePosterClick(title);
         }
     }
 }
