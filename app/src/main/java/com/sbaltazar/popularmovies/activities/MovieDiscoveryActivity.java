@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.MovieAdapter;
@@ -28,6 +30,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private ProgressBar mLoadIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         setContentView(R.layout.activity_movie_discovery);
 
         mMovieRecyclerView = findViewById(R.id.rv_movies);
+        mLoadIndicator = findViewById(R.id.pb_load_movies_indicator);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
 
@@ -55,6 +59,12 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     }
 
     public class FetchPopularMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
+
+        @Override
+        protected void onPreExecute() {
+            mMovieRecyclerView.setVisibility(View.INVISIBLE);
+            mLoadIndicator.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected List<Movie> doInBackground(Void... voids) {
@@ -80,6 +90,9 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
+
+            mLoadIndicator.setVisibility(View.INVISIBLE);
+            mMovieRecyclerView.setVisibility(View.VISIBLE);
 
             if (movies != null) {
                 mMovieAdapter.setMovies(movies);
