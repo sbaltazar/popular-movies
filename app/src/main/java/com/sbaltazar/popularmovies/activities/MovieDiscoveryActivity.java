@@ -1,6 +1,9 @@
 package com.sbaltazar.popularmovies.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,7 +11,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.MovieAdapter;
@@ -31,6 +37,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
     private ProgressBar mLoadIndicator;
+    private LinearLayout mNoInternetHelp;
+    private Button mFetchMoviesButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,16 +47,37 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         mMovieRecyclerView = findViewById(R.id.rv_movies);
         mLoadIndicator = findViewById(R.id.pb_load_movies_indicator);
+        mNoInternetHelp = findViewById(R.id.ll_no_internet);
+        mFetchMoviesButton = findViewById(R.id.btn_fetch_movies);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
 
         mMovieRecyclerView.setLayoutManager(layoutManager);
-
         mMovieAdapter = new MovieAdapter(this);
-
         mMovieRecyclerView.setAdapter(mMovieAdapter);
 
-        new FetchPopularMoviesTask().execute();
+        mFetchMoviesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (deviceHasInternetConnection()) {
+                    new FetchPopularMoviesTask().execute();
+                    mNoInternetHelp.setVisibility(View.INVISIBLE);
+                    mMovieRecyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    String message = "No internet connecion available";
+                    Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        if (deviceHasInternetConnection()) {
+            new FetchPopularMoviesTask().execute();
+        } else {
+            mMovieRecyclerView.setVisibility(View.INVISIBLE);
+            mNoInternetHelp.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -56,6 +85,15 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         Intent intent = new Intent(this, MovieDetailActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, title);
         startActivity(intent);
+    }
+
+    private boolean deviceHasInternetConnection() {
+
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
+
+        return (activeNetwork != null && activeNetwork.isConnected());
     }
 
     public class FetchPopularMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
