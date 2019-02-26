@@ -1,9 +1,16 @@
 <resources>
     <string name="app_name">Popular Movies</string>
 
+    <string name="title_popular_movies">Popular movies</string>
+    <string name="title_top_rated_movies">Top rated movies</string>
+
     <string name="movie_info_no_available">Movie information no available</string>
     <string name="no_available">No available</string>
 
-    <string name="no_internet_available">No internet connection found. Check internet settings.</string>
+    <string name="action_sort_by_popular">Sort by popular</string>
+    <string name="action_sort_by_top_rated">Sort by top rated</string>
+
+    <string name="no_internet_available">No internet connection available</string>
+    <string name="no_internet_available_check_settings">No internet connection found. Check internet settings.</string>
     <string name="try_again">Try again</string>
 </resources>

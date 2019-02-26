@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -40,6 +43,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     private LinearLayout mNoInternetHelp;
     private Button mFetchMoviesButton;
 
+    private URL mCurrentMovieUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,28 +61,30 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         mMovieAdapter = new MovieAdapter(this);
         mMovieRecyclerView.setAdapter(mMovieAdapter);
 
+        // Popular movies are fetch by default
+        mCurrentMovieUrl = NetworkUtils.getPopularMovieUrl();
+
         mFetchMoviesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (deviceHasInternetConnection()) {
-                    new FetchPopularMoviesTask().execute();
-                    mNoInternetHelp.setVisibility(View.INVISIBLE);
-                    mMovieRecyclerView.setVisibility(View.VISIBLE);
-                } else {
-                    String message = "No internet connecion available";
-                    Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
-                }
+                    new FetchMoviesTask().execute(mCurrentMovieUrl);
 
+                    showNoInternetHelp(false);
+                } else {
+                    Toast.makeText(v.getContext(), R.string.no_internet_available, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         if (deviceHasInternetConnection()) {
-            new FetchPopularMoviesTask().execute();
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.title_popular_movies);
+            }
+            new FetchMoviesTask().execute(mCurrentMovieUrl);
         } else {
-            mMovieRecyclerView.setVisibility(View.INVISIBLE);
-            mNoInternetHelp.setVisibility(View.VISIBLE);
+            showNoInternetHelp(true);
         }
-
     }
 
     @Override
@@ -85,6 +92,50 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         Intent intent = new Intent(this, MovieDetailActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, title);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_movie_discovery, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_sort_by_popular:
+                if (deviceHasInternetConnection()) {
+                    mCurrentMovieUrl = NetworkUtils.getPopularMovieUrl();
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.title_popular_movies);
+                    }
+                    new FetchMoviesTask().execute(mCurrentMovieUrl);
+                }
+                showNoInternetHelp(!deviceHasInternetConnection());
+                return true;
+
+            case R.id.action_sort_by_top_rated:
+                if (deviceHasInternetConnection()) {
+                    mCurrentMovieUrl = NetworkUtils.getTopRatedMovieUrl();
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.title_top_rated_movies);
+                    }
+                    new FetchMoviesTask().execute(mCurrentMovieUrl);
+                }
+                showNoInternetHelp(!deviceHasInternetConnection());
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showNoInternetHelp(boolean state) {
+        mNoInternetHelp.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
+        mMovieRecyclerView.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
     }
 
     private boolean deviceHasInternetConnection() {
@@ -96,7 +147,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         return (activeNetwork != null && activeNetwork.isConnected());
     }
 
-    public class FetchPopularMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
+    public class FetchMoviesTask extends AsyncTask<URL, Void, List<Movie>> {
 
         @Override
         protected void onPreExecute() {
@@ -105,22 +156,22 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         }
 
         @Override
-        protected List<Movie> doInBackground(Void... voids) {
+        protected List<Movie> doInBackground(URL... urls) {
 
-            URL popularMoviesUrl = NetworkUtils.getPopularMovieUrl();
+            URL movieUrl = urls[0];
 
             try {
-                String jsonPopularMoviesResponse = NetworkUtils
-                        .getResponseFromHttpUrl(popularMoviesUrl);
+                String jsonMoviesResponse = NetworkUtils
+                        .getResponseFromHttpUrl(movieUrl);
 
-                return MovieJsonUtils.getMoviesFromJson(jsonPopularMoviesResponse);
+                return MovieJsonUtils.getMoviesFromJson(jsonMoviesResponse);
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(TAG, "Cannot get response from popular movies url");
+                Log.e(TAG, "Cannot get response from movies url");
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e(TAG, "Cannot parse the popular movies JSON response");
+                Log.e(TAG, "Cannot parse the movies JSON response");
             }
 
             return null;
