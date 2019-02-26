@@ -1,22 +1,33 @@
 package com.sbaltazar.popularmovies.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.MovieAdapter;
 import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.utilities.MovieJsonUtils;
+import com.sbaltazar.popularmovies.utilities.NetworkUtils;
 
-import java.util.ArrayList;
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAdapter.MoviePosterClickListener {
 
+    private static final String TAG = MovieDiscoveryActivity.class.getSimpleName();
+
+    public static final int NUMBER_OF_COLUMNS = 3;
+
     private RecyclerView mMovieRecyclerView;
+    private MovieAdapter mMovieAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,25 +36,15 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         mMovieRecyclerView = findViewById(R.id.rv_movies);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
 
         mMovieRecyclerView.setLayoutManager(layoutManager);
 
-        List<Movie> titles = new ArrayList<>();
+        mMovieAdapter = new MovieAdapter(this);
 
-        titles.add(new Movie("La coca", null));
-        titles.add(new Movie("Stan Lord", null));
-        titles.add(new Movie("The parody", null));
-        titles.add(new Movie("Washaka King", null));
-        titles.add(new Movie("The Return", null));
-        titles.add(new Movie("Mendozas Summer's Surprise", null));
-        titles.add(new Movie("La chocaviga", null));
-        titles.add(new Movie("Sezaline", null));
-        titles.add(new Movie("Migration stopping", null));
+        mMovieRecyclerView.setAdapter(mMovieAdapter);
 
-        MovieAdapter adapter = new MovieAdapter(titles, this);
-
-        mMovieRecyclerView.setAdapter(adapter);
+        new FetchPopularMoviesTask().execute();
     }
 
     @Override
@@ -51,5 +52,38 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         Intent intent = new Intent(this, MovieDetailActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, title);
         startActivity(intent);
+    }
+
+    public class FetchPopularMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
+
+        @Override
+        protected List<Movie> doInBackground(Void... voids) {
+
+            URL popularMoviesUrl = NetworkUtils.getPopularMovieUrl();
+
+            try {
+                String jsonPopularMoviesResponse = NetworkUtils
+                        .getResponseFromHttpUrl(popularMoviesUrl);
+
+                return MovieJsonUtils.getMoviesFromJson(jsonPopularMoviesResponse);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Cannot get response from popular movies url");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Cannot parse the popular movies JSON response");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+
+            if (movies != null) {
+                mMovieAdapter.setMovies(movies);
+            }
+        }
     }
 }
