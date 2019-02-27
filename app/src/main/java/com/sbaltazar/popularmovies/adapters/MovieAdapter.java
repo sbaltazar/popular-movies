@@ -31,7 +31,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private int mWidth;
 
     public interface MoviePosterClickListener {
-        void onMoviePosterClick(String title);
+        void onMoviePosterClick(Movie movie);
     }
 
     public MovieAdapter(MoviePosterClickListener listener) {
@@ -102,8 +102,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            String title = mMovies.get(position).getTitle();
-            mOnClickListener.onMoviePosterClick(title);
+            mOnClickListener.onMoviePosterClick(mMovies.get(position));
         }
     }
 }

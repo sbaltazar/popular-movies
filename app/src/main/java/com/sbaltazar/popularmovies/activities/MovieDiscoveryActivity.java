@@ -29,6 +29,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.List;
 
 public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAdapter.MoviePosterClickListener {
@@ -69,7 +70,6 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
             public void onClick(View v) {
                 if (deviceHasInternetConnection()) {
                     new FetchMoviesTask().execute(mCurrentMovieUrl);
-
                     showNoInternetHelp(false);
                 } else {
                     Toast.makeText(v.getContext(), R.string.no_internet_available, Toast.LENGTH_SHORT).show();
@@ -88,9 +88,9 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     }
 
     @Override
-    public void onMoviePosterClick(String title) {
+    public void onMoviePosterClick(Movie movie) {
         Intent intent = new Intent(this, MovieDetailActivity.class);
-        intent.putExtra(Intent.EXTRA_TEXT, title);
+        intent.putExtra("movie", movie);
         startActivity(intent);
     }
 
@@ -172,6 +172,9 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.e(TAG, "Cannot parse the movies JSON response");
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Cannot parse the movie's release date");
             }
 
             return null;
