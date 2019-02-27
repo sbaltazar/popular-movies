@@ -4,20 +4,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.activities.MovieDiscoveryActivity;
 import com.sbaltazar.popularmovies.models.Movie;
-import com.sbaltazar.popularmovies.utilities.NetworkUtils;
-import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
@@ -47,6 +42,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         View view = inflater.inflate(R.layout.item_movie_tile, viewGroup, false);
 
+        // Getting the width of the imageView
         mWidth = viewGroup.getMeasuredWidth() / MovieDiscoveryActivity.NUMBER_OF_COLUMNS;
 
         return new MovieViewHolder(view);
@@ -72,14 +68,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private ImageView poster;
-        private TextView title;
+        final private ImageView poster;
 
         MovieViewHolder(@NonNull View itemView) {
             super(itemView);
-
             poster = itemView.findViewById(R.id.iv_movie_poster);
-
             itemView.setOnClickListener(this);
         }
 

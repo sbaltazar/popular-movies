@@ -25,7 +25,7 @@ public final class NetworkUtils {
     private static final String ROOT_IMAGE_URL = "https://image.tmdb.org/t/p/";
 
 
-    // List of posible poster's sizes
+    // List of possible poster's sizes
     private static final String POSTER_SIZE_W92 = "w92";
     private static final String POSTER_SIZE_W154 = "w154";
     private static final String POSTER_SIZE_W185 = "w185";

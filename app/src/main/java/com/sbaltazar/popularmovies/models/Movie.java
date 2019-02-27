@@ -27,7 +27,7 @@ public class Movie implements Parcelable {
     private Movie(Parcel in) {
         title = in.readString();
         imageUrl = in.readString();
-        image = in.readParcelable(null);
+        image = in.readParcelable(getClass().getClassLoader());
         releaseDate = (Date) in.readSerializable();
         voteAverage = in.readDouble();
         synopsis = in.readString();

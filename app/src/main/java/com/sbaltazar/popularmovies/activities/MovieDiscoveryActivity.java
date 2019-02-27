@@ -147,7 +147,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         return (activeNetwork != null && activeNetwork.isConnected());
     }
 
-    public class FetchMoviesTask extends AsyncTask<URL, Void, List<Movie>> {
+    private class FetchMoviesTask extends AsyncTask<URL, Void, List<Movie>> {
 
         @Override
         protected void onPreExecute() {

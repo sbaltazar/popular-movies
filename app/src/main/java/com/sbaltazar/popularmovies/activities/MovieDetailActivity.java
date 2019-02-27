@@ -1,15 +1,12 @@
 package com.sbaltazar.popularmovies.activities;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.models.Movie;
-import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -54,6 +51,8 @@ public class MovieDetailActivity extends AppCompatActivity {
                     mRating.setText(String.format(Locale.US, "%.1f / 10", movie.getVoteAverage()));
                     mSynopsis.setText(movie.getSynopsis());
                     mPoster.setImageBitmap(movie.getImage());
+                } else {
+                    finish();
                 }
             }
         }
