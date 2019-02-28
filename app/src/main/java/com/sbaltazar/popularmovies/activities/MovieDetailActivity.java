@@ -1,5 +1,7 @@
 package com.sbaltazar.popularmovies.activities;
 
+import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -37,23 +39,22 @@ public class MovieDetailActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.title_movie_details);
         }
 
-        if (getIntent() != null) {
-            if (getIntent().hasExtra("movie") && getIntent().getExtras() != null) {
+        if (getIntent() != null && getIntent().hasExtra("movie")) {
 
-                Movie movie = getIntent().getExtras().getParcelable("movie");
+            Movie movie = getIntent().getParcelableExtra("movie");
 
+            if (movie != null) {
                 Calendar cal = Calendar.getInstance();
+                cal.setTime(movie.getReleaseDate());
 
-                if (movie != null) {
-                    mTitle.setText(movie.getTitle());
-                    cal.setTime(movie.getReleaseDate());
-                    mReleaseDate.setText(String.format("%s", cal.get(Calendar.YEAR)));
-                    mRating.setText(String.format(Locale.US, "%.1f / 10", movie.getVoteAverage()));
-                    mSynopsis.setText(movie.getSynopsis());
-                    mPoster.setImageBitmap(movie.getImage());
-                } else {
-                    finish();
-                }
+                // Setting movie details on UI
+                mTitle.setText(movie.getTitle());
+                mReleaseDate.setText(String.format("%s", cal.get(Calendar.YEAR)));
+                mRating.setText(String.format(Locale.US, "%.1f / 10", movie.getVoteAverage()));
+                mSynopsis.setText(movie.getSynopsis());
+                mPoster.setImageBitmap(movie.getImage());
+            } else {
+                finish();
             }
         }
     }

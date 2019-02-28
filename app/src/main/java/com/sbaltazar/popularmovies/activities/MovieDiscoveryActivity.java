@@ -28,6 +28,7 @@ import com.sbaltazar.popularmovies.utilities.NetworkUtils;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
@@ -40,7 +41,6 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private ProgressBar mLoadIndicator;
     private LinearLayout mNoInternetHelp;
     private Button mFetchMoviesButton;
 
@@ -52,7 +52,6 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         setContentView(R.layout.activity_movie_discovery);
 
         mMovieRecyclerView = findViewById(R.id.rv_movies);
-        mLoadIndicator = findViewById(R.id.pb_load_movies_indicator);
         mNoInternetHelp = findViewById(R.id.ll_no_internet);
         mFetchMoviesButton = findViewById(R.id.btn_fetch_movies);
 
@@ -69,7 +68,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
             @Override
             public void onClick(View v) {
                 if (deviceHasInternetConnection()) {
-                    new FetchMoviesTask().execute(mCurrentMovieUrl);
+                    new FetchMoviesTask((MovieDiscoveryActivity) getApplicationContext(), mMovieAdapter).execute(mCurrentMovieUrl);
                     showNoInternetHelp(false);
                 } else {
                     Toast.makeText(v.getContext(), R.string.no_internet_available, Toast.LENGTH_SHORT).show();
@@ -81,7 +80,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle(R.string.title_popular_movies);
             }
-            new FetchMoviesTask().execute(mCurrentMovieUrl);
+            new FetchMoviesTask(this, mMovieAdapter).execute(mCurrentMovieUrl);
         } else {
             showNoInternetHelp(true);
         }
@@ -113,7 +112,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(R.string.title_popular_movies);
                     }
-                    new FetchMoviesTask().execute(mCurrentMovieUrl);
+                    new FetchMoviesTask(this, mMovieAdapter).execute(mCurrentMovieUrl);
                 }
                 showNoInternetHelp(!deviceHasInternetConnection());
                 return true;
@@ -124,7 +123,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(R.string.title_top_rated_movies);
                     }
-                    new FetchMoviesTask().execute(mCurrentMovieUrl);
+                    new FetchMoviesTask(this, mMovieAdapter).execute(mCurrentMovieUrl);
                 }
                 showNoInternetHelp(!deviceHasInternetConnection());
                 return true;
@@ -142,17 +141,37 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
-
-        return (activeNetwork != null && activeNetwork.isConnected());
+        if (manager != null){
+            NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
+            return (activeNetwork != null && activeNetwork.isConnected());
+        }
+        return false;
     }
 
-    private class FetchMoviesTask extends AsyncTask<URL, Void, List<Movie>> {
+    private static class FetchMoviesTask extends AsyncTask<URL, Void, List<Movie>> {
+
+        private WeakReference<MovieDiscoveryActivity> activityReference;
+
+        private MovieAdapter movieAdapter;
+
+        FetchMoviesTask(MovieDiscoveryActivity context, MovieAdapter adapter) {
+            activityReference = new WeakReference<>(context);
+            movieAdapter = adapter;
+        }
 
         @Override
         protected void onPreExecute() {
-            mMovieRecyclerView.setVisibility(View.INVISIBLE);
-            mLoadIndicator.setVisibility(View.VISIBLE);
+
+            MovieDiscoveryActivity activity = activityReference.get();
+
+            if (activity != null) {
+                // Getting UI references
+                RecyclerView movieRecyclerView = activity.findViewById(R.id.rv_movies);
+                ProgressBar loadIndicator = activity.findViewById(R.id.pb_load_movies_indicator);
+                movieRecyclerView.setVisibility(View.INVISIBLE);
+                loadIndicator.setVisibility(View.VISIBLE);
+            }
+
         }
 
         @Override
@@ -183,11 +202,19 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         @Override
         protected void onPostExecute(List<Movie> movies) {
 
-            mLoadIndicator.setVisibility(View.INVISIBLE);
-            mMovieRecyclerView.setVisibility(View.VISIBLE);
+            MovieDiscoveryActivity activity = activityReference.get();
+
+            if (activity == null || activity.isFinishing()) return;
+
+            // Getting UI references
+            RecyclerView movieRecyclerView = activity.findViewById(R.id.rv_movies);
+            ProgressBar loadIndicator = activity.findViewById(R.id.pb_load_movies_indicator);
+
+            loadIndicator.setVisibility(View.INVISIBLE);
+            movieRecyclerView.setVisibility(View.VISIBLE);
 
             if (movies != null) {
-                mMovieAdapter.setMovies(movies);
+                movieAdapter.setMovies(movies);
             }
         }
     }
