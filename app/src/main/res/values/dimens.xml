@@ -4,6 +4,13 @@
 
     <!-- Dimens for activities in general -->
     <dimen name="activity_horizontal_spacing">16dp</dimen>
+    <dimen name="single_line_item_height">56</dimen>
+    <dimen name="single_line_icon_size">16</dimen>
+    <dimen name="single_line_icon_start_spacing">16</dimen>
+    <dimen name="single_line_icon_vertical_spacing">16</dimen>
+    <dimen name="single_line_text_start_spacing">32dp</dimen>
+
+
 
     <!-- activity_movie_detail -->
     <dimen name="movie_release_date_start_spacing">8dp</dimen>

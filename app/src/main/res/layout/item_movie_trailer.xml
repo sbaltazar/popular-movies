@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/single_line_item_height"
+    android:background="@android:color/black">
+
+    <ImageView
+        android:id="@+id/iv_ic_play_trailer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/single_line_icon_start_spacing"
+        android:layout_marginLeft="@dimen/single_line_icon_start_spacing"
+        android:layout_marginTop="@dimen/single_line_icon_vertical_spacing"
+        android:layout_marginBottom="@dimen/single_line_icon_vertical_spacing"
+        android:contentDescription="@string/a11y_ic_play_trailer"
+        android:src="@drawable/ic_play_circle_outline_white_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/single_line_text_start_spacing"
+        android:layout_marginLeft="@dimen/single_line_text_start_spacing"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_ic_play_trailer"
+        app:layout_constraintStart_toEndOf="@+id/iv_ic_play_trailer"
+        app:layout_constraintTop_toTopOf="@+id/iv_ic_play_trailer"
+        tools:text="Trailer 1" />
+    
+</android.support.constraint.ConstraintLayout>
