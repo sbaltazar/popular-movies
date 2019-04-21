@@ -23,8 +23,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     final private MoviePosterClickListener mOnClickListener;
 
-    private int mWidth;
-
     public interface MoviePosterClickListener {
         void onMoviePosterClick(Movie movie);
     }
@@ -41,9 +39,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.item_movie_tile, viewGroup, false);
-
-        // Getting the width of the imageView
-        mWidth = viewGroup.getMeasuredWidth() / MovieDiscoveryActivity.NUMBER_OF_COLUMNS;
 
         return new MovieViewHolder(view);
     }
@@ -82,13 +77,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             // Getting the image bitmap to get the correct view size
             Bitmap movieImage = mMovies.get(position).getImage();
 
-            double scale = (double) mWidth / movieImage.getWidth();
-
-            double minHeight = movieImage.getHeight() * scale;
-
-            // Setting ImageView dimensions and image
-            poster.setMinimumWidth(mWidth);
-            poster.setMinimumHeight((int) Math.round(minHeight));
+            // Setting the image
             poster.setImageBitmap(movieImage);
         }
 
