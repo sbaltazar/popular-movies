@@ -21,15 +21,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_trailer_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/single_line_text_start_spacing"
         android:layout_marginLeft="@dimen/single_line_text_start_spacing"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#FFF"
         app:layout_constraintBottom_toBottomOf="@+id/iv_ic_play_trailer"
         app:layout_constraintStart_toEndOf="@+id/iv_ic_play_trailer"
         app:layout_constraintTop_toTopOf="@+id/iv_ic_play_trailer"
+        app:layout_constraintVertical_bias="0.0"
         tools:text="Trailer 1" />
-    
+
 </android.support.constraint.ConstraintLayout>

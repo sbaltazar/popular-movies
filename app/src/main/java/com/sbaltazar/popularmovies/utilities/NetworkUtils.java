@@ -40,6 +40,7 @@ public final class NetworkUtils {
     private static final String MOVIE_PATH = "movie";
     private static final String POPULAR_MOVIE_PATH = MOVIE_PATH + "/popular";
     private static final String TOP_RATED_MOVIE_PATH = MOVIE_PATH + "/top_rated";
+    private static final String MOVIE_TRAILERS_PATH = MOVIE_PATH + "/%s/videos";
 
     private static final String QUERY_API_KEY = "api_key";
 
@@ -77,6 +78,22 @@ public final class NetworkUtils {
         return url;
     }
 
+    public static URL getMovieTrailerUrl(int movieId) {
+        String movieTrailerPath = String.format(MOVIE_TRAILERS_PATH, movieId);
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL + movieTrailerPath).buildUpon()
+                .appendQueryParameter(QUERY_API_KEY, API_KEY)
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Movie trailer URL malformed");
+        }
+
+        return url;
+    }
+
     /**
      * This method returns the entire result from the HTTP response.
      *
@@ -101,6 +118,25 @@ public final class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static Uri getYoutubeUriFromVideoKey(String videoKey) {
+
+        return new Uri.Builder()
+                .scheme("vnd.youtube")
+                .authority(videoKey)
+                .build();
+    }
+
+    public static Uri getWebUriFromVideoKey(String videoKey){
+
+        return new Uri.Builder()
+                .scheme("https")
+                .authority("www.youtube.com")
+                .appendPath("watch")
+                .appendQueryParameter("v", videoKey)
+                .build();
+
     }
 
 }

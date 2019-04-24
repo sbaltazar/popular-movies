@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class Movie implements Parcelable {
 
+    private int id;
     private String title;
     private String imageUrl;
     private Bitmap image;
@@ -15,7 +16,8 @@ public class Movie implements Parcelable {
     private double voteAverage;
     private String synopsis;
 
-    public Movie(String title, String imageUrl, Bitmap image, Date releaseDate, double voteAverage, String synopsis) {
+    public Movie(int id, String title, String imageUrl, Bitmap image, Date releaseDate, double voteAverage, String synopsis) {
+        this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.image = image;
@@ -25,6 +27,7 @@ public class Movie implements Parcelable {
     }
 
     private Movie(Parcel in) {
+        id = in.readInt();
         title = in.readString();
         imageUrl = in.readString();
         image = in.readParcelable(getClass().getClassLoader());
@@ -40,6 +43,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(title);
         dest.writeString(imageUrl);
         dest.writeParcelable(image, flags);
@@ -59,6 +63,14 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
