@@ -41,6 +41,8 @@ public final class NetworkUtils {
     private static final String POPULAR_MOVIE_PATH = MOVIE_PATH + "/popular";
     private static final String TOP_RATED_MOVIE_PATH = MOVIE_PATH + "/top_rated";
     private static final String MOVIE_TRAILERS_PATH = MOVIE_PATH + "/%s/videos";
+    private static final String MOVIE_REVIEWS_PATH = MOVIE_PATH + "/%s/reviews";
+
 
     private static final String QUERY_API_KEY = "api_key";
 
@@ -89,6 +91,22 @@ public final class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
             Log.e(TAG, "Movie trailer URL malformed");
+        }
+
+        return url;
+    }
+
+    public static URL getMovieReviewUrl(int movieId) {
+        String movieReviewPath = String.format(MOVIE_REVIEWS_PATH, movieId);
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL + movieReviewPath).buildUpon()
+                .appendQueryParameter(QUERY_API_KEY, API_KEY)
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Movie review URL malformed");
         }
 
         return url;

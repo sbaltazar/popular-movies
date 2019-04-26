@@ -14,8 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sbaltazar.popularmovies.R;
+import com.sbaltazar.popularmovies.adapters.ReviewAdapter;
 import com.sbaltazar.popularmovies.adapters.TrailerAdapter;
 import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.models.MovieReview;
 import com.sbaltazar.popularmovies.models.MovieTrailer;
 import com.sbaltazar.popularmovies.utilities.MovieJsonUtils;
 import com.sbaltazar.popularmovies.utilities.NetworkUtils;
@@ -39,10 +41,14 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private TextView mSynopsis;
     private ImageView mPoster;
     private RecyclerView mTrailerRecyclerView;
+    private RecyclerView mReviewRecyclerView;
 
     private TrailerAdapter mTrailerAdapter;
+    private ReviewAdapter mReviewAdapter;
 
     private URL mMovieTrailersUrl;
+    private URL mMovieReviewsUrl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +61,25 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mSynopsis = findViewById(R.id.tv_movie_synopsis);
         mPoster = findViewById(R.id.iv_movie_poster);
         mTrailerRecyclerView = findViewById(R.id.rv_movie_trailers);
+        mReviewRecyclerView = findViewById(R.id.rv_movie_reviews);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(this, layoutManager.getOrientation());
+        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration trailerItemDecoration = new DividerItemDecoration(this, trailerLayoutManager.getOrientation());
+
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration reviewItemDecoration = new DividerItemDecoration(this, reviewLayoutManager.getOrientation());
+        reviewItemDecoration.setDrawable(getResources().getDrawable(R.drawable.divider));
 
         mTrailerAdapter = new TrailerAdapter(this);
+        mReviewAdapter = new ReviewAdapter();
 
         mTrailerRecyclerView.setAdapter(mTrailerAdapter);
-        mTrailerRecyclerView.setLayoutManager(layoutManager);
-        mTrailerRecyclerView.addItemDecoration(itemDecoration);
+        mTrailerRecyclerView.setLayoutManager(trailerLayoutManager);
+        mTrailerRecyclerView.addItemDecoration(trailerItemDecoration);
+
+        mReviewRecyclerView.setAdapter(mReviewAdapter);
+        mReviewRecyclerView.setLayoutManager(reviewLayoutManager);
+        mReviewRecyclerView.addItemDecoration(reviewItemDecoration);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_movie_details);
@@ -90,7 +106,13 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                     new FetchMovieTrailersTask(this, mTrailerAdapter).execute(mMovieTrailersUrl);
                 }
 
-                Log.d(TAG, "Movie trailer id " + movie.getId());
+
+                mMovieReviewsUrl = NetworkUtils.getMovieReviewUrl(movie.getId());
+
+                if (mMovieReviewsUrl != null) {
+                    new FetchMovieReviewsTask(this, mReviewAdapter).execute(mMovieReviewsUrl);
+                }
+
             } else {
                 finish();
             }
@@ -103,17 +125,19 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
         Intent trailerIntent = new Intent(Intent.ACTION_VIEW, playTrailerUri);
 
+        // Checks if the device has YouTube app for video playback
         if (trailerIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(trailerIntent);
         } else {
 
+            // If not, the device will open a WebView for opening the video URL
             playTrailerUri = NetworkUtils.getWebUriFromVideoKey(trailer.getUrl());
             trailerIntent = new Intent(Intent.ACTION_VIEW, playTrailerUri);
 
-            if(trailerIntent.resolveActivity(getPackageManager()) != null){
+            if (trailerIntent.resolveActivity(getPackageManager()) != null) {
                 startActivity(trailerIntent);
             } else {
-                Toast.makeText(this, "No tiene youtube instalado", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.no_video_playback, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -135,7 +159,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
             URL trailerUrl = urls[0];
 
             try {
-
                 String jsonMovieTrailersResponse = NetworkUtils.getResponseFromHttpUrl(trailerUrl);
 
                 return MovieJsonUtils.getMovieTrailersFromJson(jsonMovieTrailersResponse);
@@ -159,6 +182,51 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
             if (movieTrailers != null) {
                 trailerAdapter.setTrailers(movieTrailers);
+            }
+        }
+    }
+
+    private static class FetchMovieReviewsTask extends AsyncTask<URL, Void, List<MovieReview>> {
+
+        private WeakReference<MovieDetailActivity> activityReference;
+
+        private ReviewAdapter reviewAdapter;
+
+        FetchMovieReviewsTask(MovieDetailActivity context, ReviewAdapter adapter) {
+            activityReference = new WeakReference<>(context);
+            reviewAdapter = adapter;
+        }
+
+        @Override
+        protected List<MovieReview> doInBackground(URL... urls) {
+
+            URL reviewUrl = urls[0];
+
+            try {
+
+                String jsonMovieReviewsResponse = NetworkUtils.getResponseFromHttpUrl(reviewUrl);
+
+                return MovieJsonUtils.getMovieReviewsFromJson(jsonMovieReviewsResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Cannot get response from movie reviews url");
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Cannot parse the movie reviews JSON response");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<MovieReview> movieReviews) {
+
+            MovieDetailActivity activity = activityReference.get();
+
+            if (activity == null || activity.isFinishing()) return;
+
+            if (movieReviews != null) {
+                reviewAdapter.setReviews(movieReviews);
             }
         }
     }

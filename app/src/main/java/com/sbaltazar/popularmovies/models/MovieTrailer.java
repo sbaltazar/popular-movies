@@ -2,10 +2,10 @@ package com.sbaltazar.popularmovies.models;
 
 public class MovieTrailer {
 
-    String id;
-    String title;
-    int movieId;
-    String url;
+    private String id;
+    private String title;
+    private int movieId;
+    private String url;
 
     public MovieTrailer(String id, String title, int movieId, String url) {
         this.id = id;

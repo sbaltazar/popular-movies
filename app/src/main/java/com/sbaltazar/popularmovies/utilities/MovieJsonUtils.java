@@ -3,6 +3,7 @@ package com.sbaltazar.popularmovies.utilities;
 import android.graphics.Bitmap;
 
 import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.models.MovieReview;
 import com.sbaltazar.popularmovies.models.MovieTrailer;
 import com.squareup.picasso.Picasso;
 
@@ -87,5 +88,34 @@ public final class MovieJsonUtils {
         }
 
         return trailerList;
+    }
+
+    public static List<MovieReview> getMovieReviewsFromJson(String json) throws JSONException {
+        // Movie ID
+        final String KEY_MOVIE_ID = "id";
+        // Review details
+        final String KEY_RESULTS = "results";
+        final String KEY_AUTHOR = "author";
+        final String KEY_CONTENT = "content";
+
+        List<MovieReview> reviewList = new ArrayList<>();
+
+        JSONObject reviewsJson = new JSONObject(json);
+
+        int movieId = reviewsJson.getInt(KEY_MOVIE_ID);
+
+        JSONArray reviewArray = reviewsJson.getJSONArray(KEY_RESULTS);
+
+        for (int i = 0; i < reviewArray.length(); i++) {
+
+            JSONObject reviewJsonObject = reviewArray.getJSONObject(i);
+
+            String author = reviewJsonObject.getString(KEY_AUTHOR);
+            String content = reviewJsonObject.getString(KEY_CONTENT);
+
+            reviewList.add(new MovieReview(author, content, movieId));
+        }
+
+        return reviewList;
     }
 }
