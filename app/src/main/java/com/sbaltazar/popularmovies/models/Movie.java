@@ -1,21 +1,30 @@
 package com.sbaltazar.popularmovies.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Date;
 
+@Entity(tableName = "movies")
 public class Movie implements Parcelable {
 
+    @PrimaryKey
     private int id;
     private String title;
     private String imageUrl;
+    @Ignore
     private Bitmap image;
     private Date releaseDate;
     private double voteAverage;
     private String synopsis;
 
+    public Movie(){}
+
+    @Ignore
     public Movie(int id, String title, String imageUrl, Bitmap image, Date releaseDate, double voteAverage, String synopsis) {
         this.id = id;
         this.title = title;

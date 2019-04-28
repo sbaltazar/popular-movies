@@ -1,6 +1,7 @@
 package com.sbaltazar.popularmovies.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,8 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +42,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private TextView mReleaseDate;
     private TextView mRating;
     private TextView mSynopsis;
+    private Button mFavorite;
     private ImageView mPoster;
     private RecyclerView mTrailerRecyclerView;
     private RecyclerView mReviewRecyclerView;
@@ -49,6 +53,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private URL mMovieTrailersUrl;
     private URL mMovieReviewsUrl;
 
+    private boolean isMovieFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mReleaseDate = findViewById(R.id.tv_movie_release_date);
         mRating = findViewById(R.id.tv_movie_rating);
         mSynopsis = findViewById(R.id.tv_movie_synopsis);
+        mFavorite = findViewById(R.id.btn_favorite);
         mPoster = findViewById(R.id.iv_movie_poster);
         mTrailerRecyclerView = findViewById(R.id.rv_movie_trailers);
         mReviewRecyclerView = findViewById(R.id.rv_movie_reviews);
@@ -68,7 +74,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
         LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this);
         DividerItemDecoration reviewItemDecoration = new DividerItemDecoration(this, reviewLayoutManager.getOrientation());
-        reviewItemDecoration.setDrawable(getResources().getDrawable(R.drawable.divider));
+        reviewItemDecoration.setDrawable(getResources().getDrawable(R.drawable.border_outline));
 
         mTrailerAdapter = new TrailerAdapter(this);
         mReviewAdapter = new ReviewAdapter();
@@ -106,7 +112,6 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                     new FetchMovieTrailersTask(this, mTrailerAdapter).execute(mMovieTrailersUrl);
                 }
 
-
                 mMovieReviewsUrl = NetworkUtils.getMovieReviewUrl(movie.getId());
 
                 if (mMovieReviewsUrl != null) {
@@ -117,6 +122,14 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                 finish();
             }
         }
+
+        mFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isMovieFavorite = !isMovieFavorite;
+                toggleFavoriteButton();
+            }
+        });
     }
 
     @Override
@@ -140,6 +153,26 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                 Toast.makeText(this, R.string.no_video_playback, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void toggleFavoriteButton() {
+
+        if (isMovieFavorite) {
+            mFavorite.setBackground(getResources().getDrawable(R.drawable.border_solid));
+            Drawable favoriteIconSolid = getResources().getDrawable(R.drawable.ic_favorite_solid_24dp);
+            favoriteIconSolid.setBounds(0, 0, 60, 60);
+            mFavorite.setCompoundDrawables(favoriteIconSolid, null, null, null);
+            mFavorite.setTextColor(getResources().getColor(R.color.colorWhite));
+            mFavorite.setText(R.string.movie_added_favorites);
+        } else {
+            mFavorite.setBackground(getResources().getDrawable(R.drawable.border_outline));
+            Drawable favoriteIconOutlined = getResources().getDrawable(R.drawable.ic_favorite_outline_24dp);
+            favoriteIconOutlined.setBounds(0, 0, 60, 60);
+            mFavorite.setCompoundDrawables(favoriteIconOutlined, null, null, null);
+            mFavorite.setTextColor(getResources().getColor(R.color.colorAccent));
+            mFavorite.setText(R.string.mark_movie_favorite);
+        }
+
     }
 
     private static class FetchMovieTrailersTask extends AsyncTask<URL, Void, List<MovieTrailer>> {
