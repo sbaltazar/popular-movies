@@ -7,17 +7,16 @@ import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.sbaltazar.popularmovies.data.dao.MovieDao;
 import com.sbaltazar.popularmovies.data.entity.Movie;
+import com.sbaltazar.popularmovies.utilities.MovieJsonUtils;
 
-import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
 @TypeConverters({MovieDatabase.Converters.class})
-@Database(entities = {Movie.class}, version = 2, exportSchema = false)
+@Database(entities = {Movie.class}, version = 3, exportSchema = false)
 public abstract class MovieDatabase extends RoomDatabase {
 
     public abstract MovieDao movieDao();
@@ -56,7 +55,7 @@ public abstract class MovieDatabase extends RoomDatabase {
 
             ByteBuffer byteBuffer = ByteBuffer.wrap(data);
             // WARNING: Get the size of image from config or save the size on DB
-            Bitmap image = Bitmap.createBitmap(185, 278, Bitmap.Config.ARGB_8888);
+            Bitmap image = Bitmap.createBitmap(MovieJsonUtils.imageWidth, MovieJsonUtils.imageHeight, Bitmap.Config.ARGB_8888);
             image.copyPixelsFromBuffer(byteBuffer);
 
             return image;

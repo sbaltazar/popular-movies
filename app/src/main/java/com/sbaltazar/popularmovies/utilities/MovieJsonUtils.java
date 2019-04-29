@@ -21,6 +21,9 @@ import java.util.Locale;
 
 public final class MovieJsonUtils {
 
+    public static int imageHeight = 278;
+    public static int imageWidth = 185;
+
     public static List<Movie> getMoviesFromJson(String json) throws JSONException, IOException, ParseException {
 
         final String KEY_ID = "id";
@@ -47,7 +50,7 @@ public final class MovieJsonUtils {
             int id = movieJsonObject.getInt(KEY_ID);
             String title = movieJsonObject.getString(KEY_TITLE);
             String imagePath = NetworkUtils.IMAGE_SIZE_PATH + movieJsonObject.getString(KEY_POSTER_PATH);
-            Bitmap image = Picasso.get().load(imagePath).get();
+            Bitmap image = Picasso.get().load(imagePath).resize(imageWidth, imageHeight).get();
             String synopsis = movieJsonObject.getString(KEY_SYNOPSIS);
             Date releaseDate = sdf.parse(movieJsonObject.getString(KEY_RELEASE_DATE));
             double voteAvg = movieJsonObject.getDouble(KEY_VOTE_AVG);

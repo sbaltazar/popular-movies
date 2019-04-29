@@ -52,6 +52,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
     private URL mCurrentMovieUrl;
 
+    private ViewState viewState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +73,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         // Popular movies are fetch by default
         mCurrentMovieUrl = NetworkUtils.getPopularMovieUrl();
+        viewState = ViewState.POPULAR;
 
         mFetchMoviesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +118,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
         switch (id) {
             case R.id.action_sort_by_popular:
+                viewState = ViewState.POPULAR;
                 if (deviceHasInternetConnection()) {
                     mCurrentMovieUrl = NetworkUtils.getPopularMovieUrl();
                     if (getSupportActionBar() != null) {
@@ -126,6 +130,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                 return true;
 
             case R.id.action_sort_by_top_rated:
+                viewState = ViewState.TOP_RATED;
                 if (deviceHasInternetConnection()) {
                     mCurrentMovieUrl = NetworkUtils.getTopRatedMovieUrl();
                     if (getSupportActionBar() != null) {
@@ -136,17 +141,20 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                 showNoInternetHelp(!deviceHasInternetConnection());
                 return true;
             case R.id.action_show_favorites:
-
+                viewState = ViewState.FAVORITES;
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.title_favorite_movies);
 
-                    mMovieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
+                    Observer<List<Movie>> movieObserver = new Observer<List<Movie>>() {
                         @Override
                         public void onChanged(@Nullable List<Movie> movies) {
-                            mMovieAdapter.setMovies(movies);
+                            if(viewState == ViewState.FAVORITES){
+                                mMovieAdapter.setMovies(movies);
+                            }
                         }
-                    });
+                    };
 
+                    mMovieViewModel.getAllMovies().observe(this, movieObserver);
                 }
 
                 return true;
@@ -240,5 +248,11 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                 movieAdapter.setMovies(movies);
             }
         }
+    }
+
+    private enum ViewState {
+        POPULAR,
+        TOP_RATED,
+        FAVORITES
     }
 }
