@@ -2,9 +2,9 @@ package com.sbaltazar.popularmovies.utilities;
 
 import android.graphics.Bitmap;
 
-import com.sbaltazar.popularmovies.models.Movie;
-import com.sbaltazar.popularmovies.models.MovieReview;
-import com.sbaltazar.popularmovies.models.MovieTrailer;
+import com.sbaltazar.popularmovies.data.entity.Movie;
+import com.sbaltazar.popularmovies.data.entity.MovieReview;
+import com.sbaltazar.popularmovies.data.entity.MovieTrailer;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;

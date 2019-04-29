@@ -10,8 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.sbaltazar.popularmovies.R;
-import com.sbaltazar.popularmovies.activities.MovieDiscoveryActivity;
-import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.data.entity.Movie;
 
 import java.util.List;
 

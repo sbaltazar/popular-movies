@@ -1,9 +1,12 @@
 package com.sbaltazar.popularmovies.activities;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -19,9 +22,10 @@ import android.widget.Toast;
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.ReviewAdapter;
 import com.sbaltazar.popularmovies.adapters.TrailerAdapter;
-import com.sbaltazar.popularmovies.models.Movie;
-import com.sbaltazar.popularmovies.models.MovieReview;
-import com.sbaltazar.popularmovies.models.MovieTrailer;
+import com.sbaltazar.popularmovies.data.entity.Movie;
+import com.sbaltazar.popularmovies.data.entity.MovieReview;
+import com.sbaltazar.popularmovies.data.entity.MovieTrailer;
+import com.sbaltazar.popularmovies.data.viewmodel.MovieViewModel;
 import com.sbaltazar.popularmovies.utilities.MovieJsonUtils;
 import com.sbaltazar.popularmovies.utilities.NetworkUtils;
 
@@ -53,6 +57,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
     private URL mMovieTrailersUrl;
     private URL mMovieReviewsUrl;
 
+    private MovieViewModel mViewModel;
+
     private boolean isMovieFavorite = false;
 
     @Override
@@ -68,6 +74,8 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
         mPoster = findViewById(R.id.iv_movie_poster);
         mTrailerRecyclerView = findViewById(R.id.rv_movie_trailers);
         mReviewRecyclerView = findViewById(R.id.rv_movie_reviews);
+
+        mViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
         DividerItemDecoration trailerItemDecoration = new DividerItemDecoration(this, trailerLayoutManager.getOrientation());
@@ -93,7 +101,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
         if (getIntent() != null && getIntent().hasExtra("movie")) {
 
-            Movie movie = getIntent().getParcelableExtra("movie");
+            final Movie movie = getIntent().getParcelableExtra("movie");
 
             if (movie != null) {
                 Calendar cal = Calendar.getInstance();
@@ -118,18 +126,33 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                     new FetchMovieReviewsTask(this, mReviewAdapter).execute(mMovieReviewsUrl);
                 }
 
+                mViewModel.getMovie(movie.getId()).observe(this, new Observer<Movie>() {
+                    @Override
+                    public void onChanged(@Nullable Movie movie) {
+                        isMovieFavorite = (movie != null);
+                        toggleFavoriteButton();
+                    }
+                });
+
+                mFavorite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if(!isMovieFavorite){
+                            mViewModel.insert(movie);
+                        } else {
+                            mViewModel.delete(movie.getId());
+                        }
+
+                        isMovieFavorite = !isMovieFavorite;
+                        toggleFavoriteButton();
+                    }
+                });
+
             } else {
                 finish();
             }
         }
-
-        mFavorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isMovieFavorite = !isMovieFavorite;
-                toggleFavoriteButton();
-            }
-        });
     }
 
     @Override

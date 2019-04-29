@@ -1,5 +1,6 @@
-package com.sbaltazar.popularmovies.models;
+package com.sbaltazar.popularmovies.data.entity;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -15,10 +16,12 @@ public class Movie implements Parcelable {
     @PrimaryKey
     private int id;
     private String title;
+    @ColumnInfo(name = "image_url")
     private String imageUrl;
-    @Ignore
     private Bitmap image;
+    @ColumnInfo(name = "release_date")
     private Date releaseDate;
+    @ColumnInfo(name = "vote_average")
     private double voteAverage;
     private String synopsis;
 

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sbaltazar.popularmovies.R;
-import com.sbaltazar.popularmovies.models.MovieTrailer;
+import com.sbaltazar.popularmovies.data.entity.MovieTrailer;
 
 import java.util.List;
 

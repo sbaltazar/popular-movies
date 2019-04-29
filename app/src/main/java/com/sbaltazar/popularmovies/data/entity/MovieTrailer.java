@@ -1,4 +1,4 @@
-package com.sbaltazar.popularmovies.models;
+package com.sbaltazar.popularmovies.data.entity;
 
 public class MovieTrailer {
 

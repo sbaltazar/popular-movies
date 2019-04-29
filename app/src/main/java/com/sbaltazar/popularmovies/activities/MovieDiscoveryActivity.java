@@ -1,10 +1,13 @@
 package com.sbaltazar.popularmovies.activities;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -21,7 +24,8 @@ import android.widget.Toast;
 
 import com.sbaltazar.popularmovies.R;
 import com.sbaltazar.popularmovies.adapters.MovieAdapter;
-import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.data.entity.Movie;
+import com.sbaltazar.popularmovies.data.viewmodel.MovieViewModel;
 import com.sbaltazar.popularmovies.utilities.MovieJsonUtils;
 import com.sbaltazar.popularmovies.utilities.NetworkUtils;
 
@@ -44,6 +48,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     private LinearLayout mNoInternetHelp;
     private Button mFetchMoviesButton;
 
+    private MovieViewModel mMovieViewModel;
+
     private URL mCurrentMovieUrl;
 
     @Override
@@ -54,6 +60,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         mMovieRecyclerView = findViewById(R.id.rv_movies);
         mNoInternetHelp = findViewById(R.id.ll_no_internet);
         mFetchMoviesButton = findViewById(R.id.btn_fetch_movies);
+
+        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, NUMBER_OF_COLUMNS);
 
@@ -126,6 +134,21 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                     new FetchMoviesTask(this, mMovieAdapter).execute(mCurrentMovieUrl);
                 }
                 showNoInternetHelp(!deviceHasInternetConnection());
+                return true;
+            case R.id.action_show_favorites:
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.title_favorite_movies);
+
+                    mMovieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
+                        @Override
+                        public void onChanged(@Nullable List<Movie> movies) {
+                            mMovieAdapter.setMovies(movies);
+                        }
+                    });
+
+                }
+
                 return true;
         }
 

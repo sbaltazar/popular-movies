@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.sbaltazar.popularmovies.R;
-import com.sbaltazar.popularmovies.models.MovieReview;
+import com.sbaltazar.popularmovies.data.entity.MovieReview;
 
 import java.util.List;
 

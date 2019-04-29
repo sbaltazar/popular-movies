@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 
 import com.sbaltazar.popularmovies.data.MovieDatabase;
 import com.sbaltazar.popularmovies.data.dao.MovieDao;
-import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.data.entity.Movie;
 
 import java.util.List;
 
@@ -25,11 +25,19 @@ public class MovieRepository {
         return mAllMovies;
     }
 
-    public void insert(Movie movie){
+    public LiveData<Movie> getMovie(int movieId) {
+        return mDao.getMovie(movieId);
+    }
+
+    public void insert(Movie movie) {
         new insertTask(mDao).execute(movie);
     }
 
-    private static class insertTask extends AsyncTask<Movie, Void, Void>{
+    public void delete(int movieId){
+        new deleteTask(mDao).execute(movieId);
+    }
+
+    private static class insertTask extends AsyncTask<Movie, Void, Void> {
 
         private MovieDao mTaskDao;
 
@@ -40,6 +48,21 @@ public class MovieRepository {
         @Override
         protected Void doInBackground(Movie... movies) {
             mTaskDao.insert(movies[0]);
+            return null;
+        }
+    }
+
+    private static class deleteTask extends AsyncTask<Integer, Void, Void> {
+
+        private MovieDao mTaskDao;
+
+        deleteTask(MovieDao dao) {
+            mTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... movieIds) {
+            mTaskDao.delete(movieIds[0]);
             return null;
         }
     }

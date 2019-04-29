@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 
 import com.sbaltazar.popularmovies.data.repository.MovieRepository;
-import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.data.entity.Movie;
 
 import java.util.List;
 
@@ -25,7 +25,15 @@ public class MovieViewModel extends AndroidViewModel {
         return mAllMovies;
     }
 
+    public LiveData<Movie> getMovie(int movieId) {
+        return mRepository.getMovie(movieId);
+    }
+
     public void insert(Movie movie) {
         mRepository.insert(movie);
+    }
+
+    public void delete(int movieId) {
+        mRepository.delete(movieId);
     }
 }

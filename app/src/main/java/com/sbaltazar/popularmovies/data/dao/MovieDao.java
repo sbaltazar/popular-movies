@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.sbaltazar.popularmovies.models.Movie;
+import com.sbaltazar.popularmovies.data.entity.Movie;
 
 import java.util.List;
 
@@ -18,5 +18,12 @@ public interface MovieDao {
 
     @Query("SELECT * FROM movies")
     LiveData<List<Movie>> getAllMovies();
+
+    @Query("SELECT * FROM movies WHERE id = :id")
+    LiveData<Movie> getMovie(int id);
+
+    @Query("DELETE FROM movies WHERE id = :id")
+    void delete(int id);
+
 
 }
