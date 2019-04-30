@@ -7,12 +7,16 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -138,7 +142,7 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                     @Override
                     public void onClick(View v) {
 
-                        if(!isMovieFavorite){
+                        if (!isMovieFavorite) {
                             mViewModel.insert(movie);
                         } else {
                             mViewModel.delete(movie.getId());
@@ -153,6 +157,37 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
                 finish();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_movie_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.action_share_movie) {
+
+            String shareString = getString(R.string.share_movie_message);
+
+            String sharedMessage = String.format("%s : %s (%s)" ,
+                    shareString, mTitle.getText().toString(), mReleaseDate.getText().toString());
+
+            ShareCompat.IntentBuilder.from(this)
+                    .setChooserTitle(R.string.share_title)
+                    .setType("text/plain")
+                    .setText(sharedMessage)
+                    .startChooser();
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -236,6 +271,14 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
 
             if (activity == null || activity.isFinishing()) return;
 
+            TextView noTrailerAvailable = activity.findViewById(R.id.tv_no_trailers);
+
+            if (movieTrailers == null || movieTrailers.isEmpty()) {
+                noTrailerAvailable.setVisibility(View.VISIBLE);
+            } else {
+                noTrailerAvailable.setVisibility(View.INVISIBLE);
+            }
+
             if (movieTrailers != null) {
                 trailerAdapter.setTrailers(movieTrailers);
             }
@@ -280,6 +323,14 @@ public class MovieDetailActivity extends AppCompatActivity implements TrailerAda
             MovieDetailActivity activity = activityReference.get();
 
             if (activity == null || activity.isFinishing()) return;
+
+            TextView noReviewAvailable = activity.findViewById(R.id.tv_no_reviews);
+
+            if (movieReviews == null || movieReviews.isEmpty()) {
+                noReviewAvailable.setVisibility(View.VISIBLE);
+            } else {
+                noReviewAvailable.setVisibility(View.INVISIBLE);
+            }
 
             if (movieReviews != null) {
                 reviewAdapter.setReviews(movieReviews);

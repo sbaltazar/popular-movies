@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sbaltazar.popularmovies.R;
@@ -45,7 +46,7 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
 
     private RecyclerView mMovieRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private LinearLayout mNoInternetHelp;
+    private TextView mStatusInfo;
     private Button mFetchMoviesButton;
 
     private MovieViewModel mMovieViewModel;
@@ -60,8 +61,8 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
         setContentView(R.layout.activity_movie_discovery);
 
         mMovieRecyclerView = findViewById(R.id.rv_movies);
-        mNoInternetHelp = findViewById(R.id.ll_no_internet);
         mFetchMoviesButton = findViewById(R.id.btn_fetch_movies);
+        mStatusInfo = findViewById(R.id.tv_status_info);
 
         mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
@@ -148,8 +149,14 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
                     Observer<List<Movie>> movieObserver = new Observer<List<Movie>>() {
                         @Override
                         public void onChanged(@Nullable List<Movie> movies) {
-                            if(viewState == ViewState.FAVORITES){
-                                mMovieAdapter.setMovies(movies);
+
+                            if (movies == null || movies.isEmpty()) {
+                                showNoFavoriteMovies(true);
+                            } else {
+                                showNoFavoriteMovies(false);
+                                if (viewState == ViewState.FAVORITES) {
+                                    mMovieAdapter.setMovies(movies);
+                                }
                             }
                         }
                     };
@@ -164,15 +171,27 @@ public class MovieDiscoveryActivity extends AppCompatActivity implements MovieAd
     }
 
     private void showNoInternetHelp(boolean state) {
-        mNoInternetHelp.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
+        mStatusInfo.setText(R.string.no_internet_available);
+
+        mStatusInfo.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
+        mFetchMoviesButton.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
         mMovieRecyclerView.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
+    }
+
+    private void showNoFavoriteMovies(boolean state) {
+        mStatusInfo.setText(R.string.no_favorite_movies);
+
+        mStatusInfo.setVisibility(state ? View.VISIBLE : View.INVISIBLE);
+        mMovieRecyclerView.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
+        mFetchMoviesButton.setVisibility(View.INVISIBLE);
+
     }
 
     private boolean deviceHasInternetConnection() {
 
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (manager != null){
+        if (manager != null) {
             NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
             return (activeNetwork != null && activeNetwork.isConnected());
         }

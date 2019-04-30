@@ -1,50 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:paddingStart="@dimen/activity_horizontal_spacing"
     android:paddingEnd="@dimen/activity_horizontal_spacing"
-    android:background="@android:color/black"
     tools:context=".activities.MovieDiscoveryActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movies"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/pb_load_movies_indicator"
         android:layout_width="@dimen/loader_size"
         android:layout_height="@dimen/loader_size"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/ll_no_internet"
+
+    <TextView
+        android:id="@+id/tv_status_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="invisible">
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:textAlignment="center"
+        android:textAppearance="?android:textAppearanceMediumInverse"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Status info" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_internet_available_check_settings"
-            android:textAlignment="center"
-            android:textAppearance="?android:textAppearanceMediumInverse" />
+    <Button
+        android:id="@+id/btn_fetch_movies"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/try_again"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/tv_status_info"
+        app:layout_constraintStart_toStartOf="@+id/tv_status_info"
+        app:layout_constraintTop_toBottomOf="@+id/tv_status_info" />
 
-        <Button
-            android:id="@+id/btn_fetch_movies"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/try_again" />
 
-    </LinearLayout>
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
